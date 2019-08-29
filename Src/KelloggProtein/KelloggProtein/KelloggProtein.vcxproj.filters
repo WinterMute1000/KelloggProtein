@@ -18,9 +18,18 @@
     <ClCompile Include="KelloggProtein.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="getopt.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="injection_header.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Header.h">
+    <ClInclude Include="getopt.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="injection_header.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
