@@ -126,12 +126,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="getopt.c" />
-    <ClCompile Include="injection_header.c" />
+    <ClCompile Include="header.c" />
     <ClCompile Include="KelloggProtein.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="getopt.h" />
-    <ClInclude Include="injection_header.h" />
+    <ClInclude Include="header.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

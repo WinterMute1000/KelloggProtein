@@ -1,4 +1,4 @@
-#include "injection_header.h"
+#include "header.h"
 #include "getopt.h"
 #define KEYBOARD_HOOK_PATH "..\KeyBoardHook.dll" //If you want, change path.
 #define MAX_FILE_NAME 260
@@ -7,6 +7,8 @@ int main(int argc, char* argv)
 	const char* opt_pattern = "as:p:n:";
 	char* log_file_name = "";
 	int opt = 0;
+	DWORD injectedPID=0;
+	DWORD *pInjectedPID = &injectedPID;
 	BOOL opt_filesave = FALSE;
 
 	if (argc <= 1)
@@ -41,10 +43,22 @@ int main(int argc, char* argv)
 			printf("Save Logging.\n");
 			break;
 		case 'p'://Hook one process. (option argument: PID) 
-			printf("Hook Process: %s",optarg);
+			printf("Hook Process PID: %s",optarg);
+			if (!SearchProcess(BY_PID, atoi(optarg), NULL, pInjectedPID))
+			{
+				printf("Can't find process.\n");
+				exit(-1);
+			}
+			InjectDll(injectedPID, KEYBOARD_HOOK_PATH);
 			break;
 		case 'n'://Hook one process. (option argument: Process name) 
 			printf("Hook Process By Name: %s",optarg);
+			if (!SearchProcess(BY_PID, 0, optarg, pInjectedPID))
+			{
+				printf("Can't find process.\n");
+				exit(-1);
+			}
+			InjectDll(injectedPID, KEYBOARD_HOOK_PATH);
 			break;
 		}
 	}
