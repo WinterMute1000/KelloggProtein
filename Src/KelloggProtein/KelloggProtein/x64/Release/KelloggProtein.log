@@ -1,0 +1,9 @@
+﻿  KelloggProtein.c
+C:\Users\reali\source\repos\KelloggProtein\KelloggProtein\KelloggProtein.c(24,41): warning C4129:  'K': 문자 이스케이프 시퀀스를 인식할 수 없습니다.
+C:\Users\reali\source\repos\KelloggProtein\KelloggProtein\KelloggProtein.c(32,33): warning C4047:  '함수': 'char *const *'의 간접 참조 수준이 'char *'과(와) 다릅니다.
+C:\Users\reali\source\repos\KelloggProtein\KelloggProtein\KelloggProtein.c(32,33): warning C4024:  'getopt': 형식 및 실제 매개 변수 2의 형식이 서로 다릅니다.
+C:\Users\reali\source\repos\KelloggProtein\KelloggProtein\KelloggProtein.c(37,42): warning C4129:  'K': 문자 이스케이프 시퀀스를 인식할 수 없습니다.
+C:\Users\reali\source\repos\KelloggProtein\KelloggProtein\KelloggProtein.c(59,27): warning C4129:  'K': 문자 이스케이프 시퀀스를 인식할 수 없습니다.
+C:\Users\reali\source\repos\KelloggProtein\KelloggProtein\KelloggProtein.c(68,27): warning C4129:  'K': 문자 이스케이프 시퀀스를 인식할 수 없습니다.
+C:\Users\reali\source\repos\KelloggProtein\KelloggProtein\KelloggProtein.c(47,1): error C4996:  'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\ucrt\string.h(338): message :  'strncpy' 선언을 참조하십시오.

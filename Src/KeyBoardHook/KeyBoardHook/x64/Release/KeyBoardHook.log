@@ -1,1 +1,25 @@
-﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(425,5): error MSB8040: Spectre-mitigated libraries are required for this project. Install them from the Visual Studio installer (Individual components tab) for any toolsets and architectures being used. Learn more: https://aka.ms/Ofhn4c
+﻿  KeyBoardHook.c
+C:\Users\reali\source\repos\KeyBoardHook\KeyBoardHook\KeyBoardHook.c(138,27): warning C4013:  'MyCreateRemoteThread'이(가) 정의되지 않았습니다. extern은 int형을 반환하는 것으로 간주합니다.
+C:\Users\reali\source\repos\KeyBoardHook\KeyBoardHook\KeyBoardHook.c(182,8): warning C4047:  '함수': 'DWORD'의 간접 참조 수준이 'void *'과(와) 다릅니다.
+C:\Users\reali\source\repos\KeyBoardHook\KeyBoardHook\KeyBoardHook.c(182,8): warning C4024:  '포인터를 통한 함수': 형식 및 실제 매개 변수 8의 형식이 서로 다릅니다.
+C:\Users\reali\source\repos\KeyBoardHook\KeyBoardHook\KeyBoardHook.c(183,8): warning C4047:  '함수': 'DWORD'의 간접 참조 수준이 'void *'과(와) 다릅니다.
+C:\Users\reali\source\repos\KeyBoardHook\KeyBoardHook\KeyBoardHook.c(183,8): warning C4024:  '포인터를 통한 함수': 형식 및 실제 매개 변수 9의 형식이 서로 다릅니다.
+C:\Users\reali\source\repos\KeyBoardHook\KeyBoardHook\KeyBoardHook.c(184,8): warning C4047:  '함수': 'DWORD'의 간접 참조 수준이 'void *'과(와) 다릅니다.
+C:\Users\reali\source\repos\KeyBoardHook\KeyBoardHook\KeyBoardHook.c(184,8): warning C4024:  '포인터를 통한 함수': 형식 및 실제 매개 변수 10의 형식이 서로 다릅니다.
+C:\Users\reali\source\repos\KeyBoardHook\KeyBoardHook\KeyBoardHook.c(219,72): warning C4133:  '함수': 'LPCTSTR'과(와) 'LPCSTR' 사이의 형식이 호환되지 않습니다.
+C:\Users\reali\source\repos\KeyBoardHook\KeyBoardHook\KeyBoardHook.c(228,28): warning C4311:  '형식 캐스트': 'PROC'에서 'DWORD'(으)로 포인터가 잘립니다.
+C:\Users\reali\source\repos\KeyBoardHook\KeyBoardHook\KeyBoardHook.c(228,43): warning C4311:  '형식 캐스트': 'FARPROC'에서 'DWORD'(으)로 포인터가 잘립니다.
+C:\Users\reali\source\repos\KeyBoardHook\KeyBoardHook\KeyBoardHook.c(246,72): warning C4133:  '함수': 'LPCTSTR'과(와) 'LPCSTR' 사이의 형식이 호환되지 않습니다.
+C:\Users\reali\source\repos\KeyBoardHook\KeyBoardHook\KeyBoardHook.c(328,14): warning C4047:  'return': 'NTSTATUS'의 간접 참조 수준이 'void *'과(와) 다릅니다.
+C:\Users\reali\source\repos\KeyBoardHook\KeyBoardHook\KeyBoardHook.c(337,14): warning C4047:  'return': 'NTSTATUS'의 간접 참조 수준이 'void *'과(와) 다릅니다.
+C:\Users\reali\source\repos\KeyBoardHook\KeyBoardHook\KeyBoardHook.c(346,14): warning C4047:  'return': 'NTSTATUS'의 간접 참조 수준이 'void *'과(와) 다릅니다.
+C:\Users\reali\source\repos\KeyBoardHook\KeyBoardHook\KeyBoardHook.c(349,43): warning C4311:  '형식 캐스트': 'HANDLE'에서 'DWORD'(으)로 포인터가 잘립니다.
+C:\Users\reali\source\repos\KeyBoardHook\KeyBoardHook\KeyBoardHook.c(361,63): warning C4133:  '함수': 'char [260]'과(와) 'LPWSTR' 사이의 형식이 호환되지 않습니다.
+C:\Users\reali\source\repos\KeyBoardHook\KeyBoardHook\KeyBoardHook.c(363,34): warning C4133:  '함수': 'char [260]'과(와) 'LPCTSTR' 사이의 형식이 호환되지 않습니다.
+C:\Users\reali\source\repos\KeyBoardHook\KeyBoardHook\KeyBoardHook.c(371,14): warning C4047:  'return': 'NTSTATUS'의 간접 참조 수준이 'void *'과(와) 다릅니다.
+C:\Users\reali\source\repos\KeyBoardHook\KeyBoardHook\KeyBoardHook.c(410,27): warning C4244:  '=': 'WPARAM'에서 'char'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  코드를 생성하고 있습니다.
+  Previous IPDB not found, fall back to full compilation.
+  All 13 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  코드를 생성했습니다.
+  KeyBoardHook.vcxproj -> C:\Users\reali\source\repos\KeyBoardHook\x64\Release\KeyBoardHook.dll

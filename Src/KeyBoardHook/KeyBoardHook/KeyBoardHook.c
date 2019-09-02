@@ -3,6 +3,7 @@
 #include <wininet.h>
 #include <tchar.h>
 
+#pragma warning(disable: 4996)
 #define STR_MODULE_NAME					    L"KeyBoardHook.dll"
 #define STATUS_SUCCESS						(0x00000000L)
 
@@ -10,7 +11,7 @@
 char whatNowKeyDown = 0;
 BOOL isNewKeyHit = FALSE;
 #pragma data_seg()
-#pragma comment(linker,"/SECTION:.share.RS")
+#pragma comment(linker,"/SECTION:.share,RWS")
 
 typedef LONG NTSTATUS;
 typedef struct _CLIENT_ID 
@@ -40,11 +41,173 @@ typedef NTSTATUS(WINAPI* PFZWQUERYINFORMATIONTHREAD)
 	PVOID ThreadInformation,
 	ULONG ThreadInformationLength,
 	PULONG ReturnLength
+);
+
+typedef DWORD(WINAPI* PFNTCREATETHREADEX)
+(
+	PHANDLE                 ThreadHandle,
+	ACCESS_MASK             DesiredAccess,
+	LPVOID                  ObjectAttributes,
+	HANDLE                  ProcessHandle,
+	LPTHREAD_START_ROUTINE  lpStartAddress,
+	LPVOID                  lpParameter,
+	BOOL	                CreateSuspended,
+	DWORD                   dwStackSize,
+	DWORD                   dw1,
+	DWORD                   dw2,
+	LPVOID                  Unknown
 	);
 HHOOK g_hook = NULL;
 HINSTANCE g_hInstance = NULL;
 
 BYTE g_pZWRT[5] = { 0, };
+
+BOOL IsVistaLater()
+{
+	OSVERSIONINFO osvi;
+
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+
+	GetVersionExW(&osvi);
+
+	if (osvi.dwMajorVersion >= 6)
+		return TRUE;
+
+	return FALSE;
+}
+
+void DebugLog(const char* format, ...)
+{
+	va_list vl;
+	FILE* pf = NULL;
+	char szLog[512] = { 0, };
+
+	va_start(vl, format);
+	wsprintfA(szLog, format, vl);
+	va_end(vl);
+
+	OutputDebugStringA(szLog);
+}
+
+BOOL InjectDll(DWORD dwPID, LPCTSTR szDllPath)
+{
+	HANDLE                  hProcess = NULL;
+	HANDLE                  hThread = NULL;
+	LPVOID                  pRemoteBuf = NULL;
+	DWORD                   dwBufSize = (DWORD)(_tcslen(szDllPath) + 1) * sizeof(TCHAR);
+	LPTHREAD_START_ROUTINE  pThreadProc = NULL;
+	BOOL                    bRet = FALSE;
+	HMODULE                 hMod = NULL;
+
+	if (!(hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwPID)))
+	{
+		DebugLog("InjectDll() : OpenProcess(%d) failed!!! [%d]\n", dwPID, GetLastError());
+		goto INJECTDLL_EXIT;
+	}
+
+	pRemoteBuf = VirtualAllocEx(hProcess, NULL, dwBufSize,
+		MEM_COMMIT, PAGE_READWRITE);
+	if (pRemoteBuf == NULL)
+	{
+		DebugLog("InjectDll() : VirtualAllocEx() failed!!! [%d]\n", GetLastError());
+		goto INJECTDLL_EXIT;
+	}
+
+	if (!WriteProcessMemory(hProcess, pRemoteBuf,
+		(LPVOID)szDllPath, dwBufSize, NULL))
+	{
+		DebugLog("InjectDll() : WriteProcessMemory() failed!!! [%d]\n", GetLastError());
+		goto INJECTDLL_EXIT;
+	}
+
+	hMod = GetModuleHandle(L"kernel32.dll");
+	if (hMod == NULL)
+	{
+		DebugLog("InjectDll() : GetModuleHandle() failed!!! [%d]\n", GetLastError());
+		goto INJECTDLL_EXIT;
+	}
+
+	pThreadProc = (LPTHREAD_START_ROUTINE)GetProcAddress(hMod, "LoadLibraryW");
+	if (pThreadProc == NULL)
+	{
+		DebugLog("InjectDll() : GetProcAddress() failed!!! [%d]\n", GetLastError());
+		goto INJECTDLL_EXIT;
+	}
+
+	if (!MyCreateRemoteThread(hProcess, pThreadProc, pRemoteBuf))
+	{
+		DebugLog("InjectDll() : MyCreateRemoteThread() failed!!!\n");
+		goto INJECTDLL_EXIT;
+	}
+
+	bRet = TRUE;
+
+INJECTDLL_EXIT:
+
+	if (pRemoteBuf)
+		VirtualFreeEx(hProcess, pRemoteBuf, 0, MEM_RELEASE);
+
+	if (hThread)
+		CloseHandle(hThread);
+
+	if (hProcess)
+		CloseHandle(hProcess);
+
+	return bRet;
+}
+
+BOOL MyCreateRemoteThread(HANDLE hProcess, LPTHREAD_START_ROUTINE pThreadProc, LPVOID pRemoteBuf)
+{
+	HANDLE      hThread = NULL;
+	FARPROC     pFunc = NULL;
+
+	if (IsVistaLater())    // Vista, 7, Server2008
+	{
+		pFunc = GetProcAddress(GetModuleHandleA("ntdll.dll"), "NtCreateThreadEx");
+		if (pFunc == NULL)
+		{
+			DebugLog("MyCreateRemoteThread() : GetProcAddress() failed!!! [%d]\n",
+				GetLastError());
+			return FALSE;
+		}
+
+		((PFNTCREATETHREADEX)pFunc)(&hThread,
+			0x1FFFFF,
+			NULL,
+			hProcess,
+			pThreadProc,
+			pRemoteBuf,
+			FALSE,
+			NULL,
+			NULL,
+			NULL,
+			NULL);
+		if (hThread == NULL)
+		{
+			DebugLog("MyCreateRemoteThread() : NtCreateThreadEx() failed!!! [%d]\n", GetLastError());
+			return FALSE;
+		}
+	}
+	else                    // 2000, XP, Server2003
+	{
+		hThread = CreateRemoteThread(hProcess, NULL, 0,
+			pThreadProc, pRemoteBuf, 0, NULL);
+		if (hThread == NULL)
+		{
+			DebugLog("MyCreateRemoteThread() : CreateRemoteThread() failed!!! [%d]\n", GetLastError());
+			return FALSE;
+		}
+	}
+
+	if (WAIT_FAILED == WaitForSingleObject(hThread, INFINITE))
+	{
+		DebugLog("MyCreateRemoteThread() : WaitForSingleObject() failed!!! [%d]\n", GetLastError());
+		return FALSE;
+	}
+
+	return TRUE;
+}
 
 BOOL hook_by_code(LPCTSTR szDllName, LPCTSTR szFuncName, PROC pfnNew, PBYTE pOrgBytes)
 {
@@ -71,6 +234,8 @@ BOOL hook_by_code(LPCTSTR szDllName, LPCTSTR szFuncName, PROC pfnNew, PBYTE pOrg
 
 	return TRUE;
 }
+
+
 
 BOOL unhook_by_code(LPCTSTR szDllName, LPCTSTR szFuncName, PBYTE pOrgBytes)
 {
@@ -184,7 +349,7 @@ NTSTATUS WINAPI NewZwResumeThread(HANDLE ThreadHandle, PULONG SuspendCount)
 	dwPID = (DWORD)tbi.ClientId.UniqueProcess;
 	if ((dwPID != GetCurrentProcessId()) && (dwPID != dwPrevPID))
 	{
-		DebugLog("NewZwResumeThread() => call InjectDll()\n");
+		DebugLog("NewZwResumeThread() => call \n");
 
 		dwPrevPID = dwPID;
 
@@ -284,6 +449,11 @@ extern "C"
 	{
 		isNewKeyHit = FALSE;
 		return whatNowKeyDown;
+	}
+
+	_declspec(dllexport) BOOL IsNewKeyHit()
+	{
+		return isNewKeyHit;
 	}
 }
 #endif
