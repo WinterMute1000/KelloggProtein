@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <tlhelp32.h>
 #include <time.h>
+#include <stdlib.h>
+#include <process.h>
 #define MAX_PROCESS_NAME_LENGTH 260
 #define MAX_FILE_LENGTH 260
 #define GET_KEYBOARD_EVENT_FUNC "IsNewKeyHit"
